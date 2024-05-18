@@ -14,7 +14,7 @@ export default function Status() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/get/item1');
+        const response = await axios.get('https://system-back-2no1.onrender.com/get/item1');
         setItems(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);

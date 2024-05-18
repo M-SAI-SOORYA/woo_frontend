@@ -7,7 +7,7 @@ export default function History() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/get/items');
+                const response = await axios.get('https://system-back-2no1.onrender.com/get/items');
                 setItems(Array.isArray(response.data) ? response.data : []);
             } catch (error) {
                 console.error('Error fetching data:', error);
