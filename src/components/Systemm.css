@@ -1,0 +1,24 @@
+/* System.css */
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+}
+
+.btn {
+    min-width: 100px;
+}
+
+input {
+    min-width: 200px;
+}
+
+button[type="submit"] {
+    width: 100%;
+}
