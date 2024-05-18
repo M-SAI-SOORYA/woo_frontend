@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.42c7eb84.css",
+    "main.js": "/static/js/main.6f599d61.js",
+    "static/js/453.b0cbd5c8.chunk.js": "/static/js/453.b0cbd5c8.chunk.js",
+    "static/media/kaja.jpg": "/static/media/kaja.e2e5afdc2af20f8538f4.jpg",
+    "index.html": "/index.html",
+    "main.42c7eb84.css.map": "/static/css/main.42c7eb84.css.map",
+    "main.6f599d61.js.map": "/static/js/main.6f599d61.js.map",
+    "453.b0cbd5c8.chunk.js.map": "/static/js/453.b0cbd5c8.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.42c7eb84.css",
+    "static/js/main.6f599d61.js"
+  ]
+}
