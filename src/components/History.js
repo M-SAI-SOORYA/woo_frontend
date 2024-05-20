@@ -33,7 +33,7 @@ export default function History() {
                         <th scope="col">Total XP</th>
                         <th scope="col">Rewards</th>
                         <th scope="col">Penalties</th>
-                        <th scope="col">Job</th>
+                        {/* <th scope="col">Job</th> */}
                     </tr>
                 </thead>
                 <tbody>
@@ -50,7 +50,7 @@ export default function History() {
                             <td>{item.totalXp}</td>
                             <td>{item.rewards}</td>
                             <td>{item.penalties}</td>
-                            <td>{item.job}</td>
+                            {/* <td>{item.job}</td> */}
                         </tr>
                     ))}
                 </tbody>

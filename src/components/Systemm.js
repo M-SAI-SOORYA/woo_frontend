@@ -1,10 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import axios from 'axios';
 
 import './Systemm.css'; // Custom CSS file for additional styling
 import Swal from 'sweetalert2';
 export default function Systemm() {
     // Define state variables for input values
+    const [items, setItems] = useState({});
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('https://system-back-2no1.onrender.com/get/item1');
+                setItems(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
     const [gymInput, setGymInput] = useState('');
     const [todoInput, setTodoInput] = useState('');
     const [dietInput, setDietInput] = useState('');
@@ -19,6 +32,7 @@ export default function Systemm() {
     // Handle input change for each input field
     const handleInputChange = (event, setInput, setXp, xp) => {
         setInput(event.target.value);
+        
         if (event.target.value.toLowerCase() === 'yes') {
             setXp(xp + 25);
         } else if (event.target.value.toLowerCase() === 'no') {
@@ -29,19 +43,13 @@ export default function Systemm() {
     };
 
     // Handle form submission.
-    
-    
-    // const getCurrentLevel = (totxp) => {
-    //     const xpPerLevel = 100;
-    //     const level = Math.floor(totxp / xpPerLevel);
-    //     return level;
-    // };
-  
-    
+
+
+
     const handleSubmit = async (event) => {
-        event.preventDefault(); 
-        // Prevent default form submission behavior
-        
+        event.preventDefault(); // Prevent default form submission behavior
+        const prevLevel = items.currentlevel; // Store the current level before the data is submitted
+        const prevtitle=items.title;
         try {
             // Send POST request to backend route '/xp' with input data
             const response = await axios.post('https://system-back-2no1.onrender.com/xp', {
@@ -49,39 +57,94 @@ export default function Systemm() {
                 todoXp: todoXp,
                 dietXp: dietXp,
                 socialXp: socialXp,
-              
             });
+
             const response2 = await axios.post('https://system-back-2no1.onrender.com/datexp', {
                 gymXp: gymXp,
                 todoXp: todoXp,
                 dietXp: dietXp,
                 socialXp: socialXp,
-              
             });
 
-
             // Handle successful response from server (if needed)
+         
             console.log('XP data saved successfully:', response.data);
             console.log('XP data saved successfully:', response2.data);
+
+            // Fetch updated data after submission
+            const updatedItems = await axios.get('https://system-back-2no1.onrender.com/get/item1');
+            setItems(updatedItems.data);
+          
+            // Display the success message for data submission
+            Swal.fire({
+                title: 'Success!',
+                text: 'Your data has been submitted successfully.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // After the first popup is closed, check if the user has leveled up
+                
+                if (updatedItems.data.currentlevel > prevLevel) {
+                    Swal.fire({
+                        title: 'You Leveled Up!',
+                        html: `<strong>You reached Level</strong>: <strong>${updatedItems.data.currentlevel}</strong>`,
+
+                        icon: 'success',
+                        confirmButtonText: 'Keep Moving Forward!',
+                        customClass: {
+                            popup: 'swal2-backdrop-custom'
+                        }   
+                    });
+                }
+                
+                
+            }).then(()=>{
+                if (updatedItems.data.rewards !== "No Rewards Right Now") {
+                  
+                    Swal.fire({
+                        title: 'Rewards!',
+                        html: `Congratulations! The <strong>REWARD</strong> is: <strong>${updatedItems.data.rewards}</strong>`,
+                      
+                        confirmButtonText: 'Awesome!',
+                        customClass: {
+                            popup: 'swal2-reward-custom'
+                        },
+                    });
+                }
+            }).then(()=>{
+                if(updatedItems.data.penalties !== "No Penalties Till Now")
+                Swal.fire({
+                    title: 'Penalty!!',
+                    html: `You failed a daily quest so <strong>Penalty</strong> is : <strong>${updatedItems.data.penalties}</strong>`,
+                  
+                    confirmButtonText: 'Wont Repeat This!',
+                    customClass: {
+                        popup: 'swal2-reward-custom'
+                    },
+                });
+            }).then(()=>{
+                if(updatedItems.data.title !== prevtitle){
+                    Swal.fire({
+                        title: 'Promoted!!',
+                        html: `You are now => <strong>${updatedItems.data.title}</strong>`,
+                      
+                        confirmButtonText: 'Alright!',
+                        customClass: {
+                            popup: 'swal2-reward-custom'
+                        },
+                    });
+                }
+            })
+
         } catch (error) {
             // Handle error
             console.error('Error saving XP data:', error);
         }
     };
-
-    // Calculate current level based on total XP
-   
-    const pop = () => {
-        Swal.fire({
-            title: 'Success!',
-            text: 'Your data has been submitted successfully.',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        });
-    };
+    
     return (
         <div className='container my-5'>
-            <h1 style={{textAlign:"center"}}>Welcome Player!</h1>
+            <h1 style={{ textAlign: "center" }}>Welcome Player!</h1>
             <h1 className="text-center mb-5">Always Give Your 100%</h1>
 
             <form onSubmit={handleSubmit}>
@@ -133,7 +196,7 @@ export default function Systemm() {
                     />
                 </div>
 
-                <button type="submit" className="btn btn-primary btn-block mt-4" onClick={pop}>Submit</button>
+                <button type="submit" className="btn btn-primary btn-block mt-4">Submit</button>
             </form>
         </div>
     );
