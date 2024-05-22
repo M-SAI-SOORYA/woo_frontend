@@ -8,14 +8,14 @@
       "type": "image/x-icon"
     },
     {
-      "src": "wallpapersden.com_sung-jin-woo-digital-solo-leveling_1927x1080.jpg",
-      "type": "image/jpg",
-      "sizes": "1920x1080"
+      "src": "playstore-icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
     },
     {
-      "src": "wallpapersden.com_sung-jin-woo-digital-solo-leveling_1927x1080.jpg",
-      "type": "image/jpg",
-      "sizes": "1920x1080"
+      "src": "playstore-icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
   "start_url": ".",
