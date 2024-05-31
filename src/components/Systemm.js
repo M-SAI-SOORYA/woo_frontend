@@ -102,7 +102,7 @@ export default function Systemm() {
                 if (updatedItems.data.rewards !== "No Rewards Right Now") {
                   
                     Swal.fire({
-                        title: 'Rewards!',
+                        title: `Rewards! Level: ${updatedItems.data.currentlevel}`,
                         html: `Congratulations! The <strong>REWARD</strong> is: <strong>${updatedItems.data.rewards}</strong>`,
                       
                         confirmButtonText: 'Awesome!',
@@ -114,8 +114,8 @@ export default function Systemm() {
             }).then(()=>{
                 if(updatedItems.data.penalties !== "No Penalties Till Now")
                 Swal.fire({
-                    title: 'Penalty!!',
-                    html: `You failed a daily quest so <strong>Penalty</strong> is : <strong>${updatedItems.data.penalties}</strong>`,
+                    title:  `Penalty!!  Level: ${updatedItems.data.currentlevel}`,
+                    html: `You failed in daily quests so <strong>Penalty</strong> is : <strong>${updatedItems.data.penalties}</strong>`,
                   
                     confirmButtonText: 'Wont Repeat This!',
                     customClass: {
@@ -125,8 +125,8 @@ export default function Systemm() {
             }).then(()=>{
                 if(updatedItems.data.title !== prevtitle){
                     Swal.fire({
-                        title: 'Promoted!!',
-                        html: `You are now => <strong>${updatedItems.data.title}</strong>`,
+                        title: `Promoted!!  Level: ${updatedItems.data.currentlevel}`,
+                        html: `You are now => <strong>${updatedItems.data.title}!!</strong>`,
                       
                         confirmButtonText: 'Alright!',
                         customClass: {
