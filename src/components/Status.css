@@ -1,75 +1,452 @@
-/* Common Styles */
-.cont {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  padding: 20px;
-}
-
-.card {
-  background-image: url("kaja.jpg");
-  background-size: cover;
-  background-position: center;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px 40px;
-  max-width: 600px;
-  width: 100%;
-  text-align: center;
-  color: white; /* Ensure text is visible */
-  margin-bottom: 20px; /* Add margin to separate cards */
-}
-
-.status-title {
-  font-size: 40px;
-  font-family: fantasy;
-  margin: 20px 0;
-  color: #010c11;
-}
-
-.details-grid {
+.status-page,
+.history-page {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-
+  gap: 22px;
+  animation: pageRise 280ms ease both;
 }
 
-p {
-  font-size: 20px;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  margin: 10px 0;
+.profile-band,
+.history-hero {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 250px;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-strong {
-  color: #070707;
+.profile-band {
+  background:
+    linear-gradient(90deg, rgba(12, 17, 29, 0.96), rgba(12, 17, 29, 0.64)),
+    url("../images/HD-wallpaper-sololeveling-twitter-solo-leveling-manga.jpg") center/cover;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .card {
-    padding: 20px;
+.history-hero {
+  background:
+    linear-gradient(90deg, rgba(12, 17, 29, 0.96), rgba(12, 17, 29, 0.68)),
+    url("../images/solo-leveling-characters-good-pfp-j6glq0yye4ieegdk.jpg") center/cover;
+}
+
+.profile-band h1,
+.history-hero h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 4.8rem);
+  letter-spacing: 0;
+  line-height: 0.95;
+}
+
+.profile-band p:not(.eyebrow),
+.history-hero p:not(.eyebrow) {
+  max-width: 690px;
+  margin: 12px 0 0;
+  color: var(--muted);
+}
+
+.profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.profile-meta span,
+.level-chip {
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+
+.level-emblem {
+  display: grid;
+  width: 152px;
+  height: 152px;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(56, 189, 248, 0.22), transparent 56%),
+    rgba(8, 14, 26, 0.86);
+  box-shadow: 0 0 34px rgba(56, 189, 248, 0.18);
+}
+
+.level-emblem span,
+.metric-card span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.level-emblem strong {
+  color: var(--text);
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.status-grid,
+.history-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.metric-card {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(18, 26, 43, 0.94), rgba(12, 17, 29, 0.9)),
+    var(--panel);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.24);
+}
+
+.metric-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.12), transparent 45%);
+}
+
+.metric-card strong,
+.metric-card p,
+.metric-card span {
+  position: relative;
+}
+
+.metric-card strong {
+  display: block;
+  margin: 8px 0;
+  color: var(--text);
+  font-size: 2.35rem;
+  line-height: 1;
+}
+
+.metric-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.level-panel,
+.habit-status-panel,
+.history-page .panel {
+  padding: 22px;
+}
+
+.level-progress-large {
+  height: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.level-progress-large div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.28);
+}
+
+.level-readout {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+.level-readout strong {
+  color: var(--text);
+}
+
+.stat-list {
+  display: grid;
+  gap: 14px;
+  padding: 0 20px 20px;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) 90px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.stat-row span,
+.stat-row strong {
+  color: var(--text);
+}
+
+.stat-meter {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.stat-meter div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+.status-habit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.status-habit-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.status-habit-card.is-complete {
+  border-color: rgba(34, 197, 94, 0.34);
+  background: rgba(34, 197, 94, 0.07);
+}
+
+.status-habit-card strong,
+.status-habit-card span {
+  display: block;
+}
+
+.status-habit-card span {
+  margin-top: 3px;
+  color: var(--muted);
+}
+
+.status-habit-card em {
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 900;
+}
+
+.history-timeline {
+  display: grid;
+  gap: 12px;
+}
+
+.history-record {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 110px;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.history-record:hover {
+  border-color: rgba(56, 189, 248, 0.34);
+  background: rgba(255, 255, 255, 0.055);
+  transform: translateY(-1px);
+}
+
+.record-main span {
+  display: block;
+  color: var(--muted);
+}
+
+.record-main strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--text);
+}
+
+.record-date {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.record-date > strong {
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.date-badge {
+  display: grid;
+  min-width: 58px;
+  place-items: center;
+  padding: 8px 9px;
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  border-radius: 8px;
+  background: rgba(56, 189, 248, 0.1);
+  box-shadow: inset 0 0 18px rgba(56, 189, 248, 0.06);
+}
+
+.date-badge strong {
+  color: var(--text);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.date-badge span,
+.date-badge small {
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.record-xp {
+  justify-self: end;
+  border-radius: 999px;
+  padding: 8px 10px;
+  font-weight: 900;
+}
+
+.positive {
+  color: var(--accent-2);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.negative {
+  color: var(--danger);
+  background: rgba(251, 113, 133, 0.1);
+}
+
+.empty-history {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+@media (max-width: 820px) {
+  .profile-band,
+  .history-hero {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
-  .status-title {
-    font-size: 32px;
+  .status-grid,
+  .history-summary,
+  .status-habit-grid {
+    grid-template-columns: 1fr;
   }
 
-  p {
-    font-size: 18px;
+  .stat-row,
+  .history-record {
+    grid-template-columns: 1fr;
+  }
+
+  .record-xp {
+    justify-self: start;
+  }
+
+  .record-date {
+    justify-content: space-between;
+  }
+
+  .level-readout {
+    flex-direction: column;
   }
 }
 
-@media (max-width: 480px) {
-  .card {
-    padding: 20px;
+@media (max-width: 620px) {
+  .status-page,
+  .history-page {
+    gap: 16px;
   }
 
-  .status-title {
-    font-size: 28px;
+  .profile-band,
+  .history-hero {
+    min-height: 220px;
+    padding: 22px;
   }
 
-  p {
-    font-size: 16px;
+  .profile-band h1,
+  .history-hero h1 {
+    font-size: 2.35rem;
+  }
+
+  .level-emblem {
+    width: 124px;
+    height: 124px;
+  }
+
+  .level-emblem strong {
+    font-size: 3.2rem;
+  }
+
+  .metric-card {
+    padding: 16px;
+  }
+
+  .metric-card strong {
+    font-size: 2rem;
+  }
+
+  .level-panel,
+  .habit-status-panel,
+  .history-page .panel {
+    padding: 16px;
+  }
+
+  .stat-list {
+    padding: 0 16px 16px;
+  }
+
+  .status-habit-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 430px) {
+  .profile-band,
+  .history-hero {
+    padding: 18px;
+  }
+
+  .profile-band p:not(.eyebrow),
+  .history-hero p:not(.eyebrow) {
+    font-size: 0.95rem;
+  }
+
+  .profile-meta span,
+  .level-chip {
+    width: 100%;
+    text-align: center;
+  }
+
+  .level-emblem {
+    width: 100%;
+    height: auto;
+    min-height: 104px;
+  }
+
+  .level-readout {
+    gap: 6px;
+  }
+
+  .history-record {
+    padding: 12px;
   }
 }

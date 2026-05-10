@@ -1,38 +1,401 @@
-.App {
-  text-align: center;
+:root {
+  --bg: #0c111d;
+  --panel: rgba(18, 26, 43, 0.88);
+  --panel-solid: #121a2b;
+  --panel-light: #172235;
+  --line: rgba(255, 255, 255, 0.11);
+  --text: #eff6ff;
+  --muted: #97a6ba;
+  --accent: #38bdf8;
+  --accent-2: #22c55e;
+  --danger: #fb7185;
+  --warning: #f59e0b;
+  --system-glow: rgba(56, 189, 248, 0.42);
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+body {
+  min-width: 0;
+  background:
+    linear-gradient(rgba(8, 13, 24, 0.78), rgba(8, 13, 24, 0.9)),
+    url("./images/wallpapersden.com_sung-jin-woo-digital-solo-leveling_1927x1080.jpg") center/cover fixed;
+  color: var(--text);
+  overflow-x: hidden;
 }
 
-.App-header {
-  background-color: #282c34;
+.app-shell {
   min-height: 100vh;
+}
+
+.app-main {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 56px;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px max(18px, calc((100vw - 1180px) / 2));
+  background: rgba(9, 14, 25, 0.84);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(16px);
 }
 
-.App-link {
-  color: #61dafb;
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+  text-decoration: none;
 }
 
-@keyframes App-logo-spin {
+.brand-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-reward-link {
+  color: var(--accent);
+  text-decoration: none;
+  padding: 9px 12px;
+  border: 1px solid rgba(56, 189, 248, 0.38);
+  border-radius: 8px;
+  background: rgba(56, 189, 248, 0.1);
+  font-weight: 800;
+}
+
+.brand-reward-link.active,
+.brand-reward-link:hover {
+  color: var(--text);
+  background: rgba(56, 189, 248, 0.18);
+}
+
+.brand-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  border-radius: 8px;
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.brand strong,
+.brand small {
+  display: block;
+}
+
+.brand small {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.nav-links a.active,
+.nav-links a:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.panel-heading h2,
+.hero-panel h1,
+.profile-band h1 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.page-state {
+  display: grid;
+  min-height: 360px;
+  place-items: center;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.system-toast {
+  position: fixed;
+  top: 86px;
+  right: max(18px, calc((100vw - 1180px) / 2));
+  z-index: 1000;
+  width: min(390px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.42);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(11, 18, 32, 0.98), rgba(15, 25, 44, 0.94)),
+    rgba(11, 18, 32, 0.96);
+  box-shadow:
+    0 22px 70px rgba(0, 0, 0, 0.48),
+    0 0 34px var(--system-glow),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+  animation: systemToastIn 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.system-toast::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(56, 189, 248, 0.18), transparent 28%, transparent 72%, rgba(56, 189, 248, 0.12)),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0, rgba(255, 255, 255, 0.025) 1px, transparent 1px, transparent 5px);
+}
+
+.system-toast-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.22), transparent);
+  transform: translateX(-120%);
+  animation: systemScan 1250ms ease-out both;
+}
+
+.system-toast-core {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 16px 16px 18px;
+}
+
+.system-toast-mark {
+  display: grid;
+  min-width: 76px;
+  min-height: 34px;
+  place-items: center;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 7px;
+  color: var(--accent);
+  background: rgba(56, 189, 248, 0.1);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.system-toast-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.system-toast-copy strong {
+  color: var(--text);
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.system-toast-copy span,
+.system-toast-copy small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.system-toast-copy small {
+  font-size: 0.76rem;
+}
+
+.system-toast-progress {
+  position: relative;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 18px var(--system-glow);
+  transform-origin: left;
+  animation: systemToastProgress 3400ms linear forwards;
+}
+
+.system-toast-error {
+  border-color: rgba(251, 113, 133, 0.55);
+  --system-glow: rgba(251, 113, 133, 0.38);
+}
+
+.system-toast-error .system-toast-mark,
+.system-toast-error .system-toast-progress {
+  border-color: rgba(251, 113, 133, 0.52);
+  color: #fecdd3;
+  background: linear-gradient(90deg, var(--danger), #fda4af);
+}
+
+.system-toast-warning {
+  border-color: rgba(245, 158, 11, 0.5);
+  --system-glow: rgba(245, 158, 11, 0.34);
+}
+
+.system-toast-warning .system-toast-mark,
+.system-toast-warning .system-toast-progress {
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fde68a;
+  background: linear-gradient(90deg, var(--warning), #facc15);
+}
+
+@keyframes systemToastIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+    filter: blur(5px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes systemToastProgress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes systemScan {
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@media (max-width: 700px) {
+  .app-main {
+    width: min(100% - 24px, 1180px);
+    padding: 18px 0 40px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .brand-cluster {
+    width: 100%;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .nav-links {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .nav-links a {
+    flex: 1 0 auto;
+    text-align: center;
+    white-space: nowrap;
+    padding: 9px 10px;
+  }
+
+  .system-toast {
+    top: auto;
+    right: 16px;
+    bottom: 18px;
+  }
+}
+
+@media (max-width: 430px) {
+  .app-main {
+    width: min(100% - 18px, 1180px);
+    padding-top: 14px;
+  }
+
+  .brand {
+    gap: 9px;
+  }
+
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+  }
+
+  .brand-reward-link {
+    padding: 8px 10px;
+    font-size: 0.86rem;
+  }
+
+  .panel-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .system-toast {
+    right: 9px;
+    bottom: 12px;
+    width: calc(100vw - 18px);
+  }
+
+  .system-toast-core {
+    grid-template-columns: 1fr;
+    gap: 9px;
+    padding: 14px;
+  }
+
+  .system-toast-mark {
+    min-width: 0;
+    width: max-content;
+    min-height: 30px;
+    padding: 0 10px;
   }
 }

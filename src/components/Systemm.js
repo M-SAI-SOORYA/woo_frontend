@@ -1,203 +1,343 @@
-import React, { useState,useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect, useMemo, useState } from "react";
+import api from "../api";
+import { notifySystem } from "./SystemToast";
+import "./Systemm.css";
 
-import './Systemm.css'; // Custom CSS file for additional styling
-import Swal from 'sweetalert2';
+const emptyHabit = {
+  name: "",
+  category: "",
+  stat: "",
+  xp: 25,
+  penalty: 10,
+  cadence: "daily",
+};
+
 export default function Systemm() {
-    // Define state variables for input values
-    const [items, setItems] = useState({});
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('https://system-back-2no1.onrender.com/get/item1');
-                setItems(response.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
+  const [dashboard, setDashboard] = useState(null);
+  const [checkins, setCheckins] = useState({});
+  const [habitForm, setHabitForm] = useState(emptyHabit);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-        fetchData();
-    }, []);
-    const [gymInput, setGymInput] = useState('');
-    const [todoInput, setTodoInput] = useState('');
-    const [dietInput, setDietInput] = useState('');
-    const [socialConfidenceInput, setSocialConfidenceInput] = useState('');
+  const loadDashboard = async ({ showLoading = false } = {}) => {
+    if (showLoading) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+    }
+    try {
+      const response = await api.get("/api/dashboard");
+      setDashboard(response.data);
+      const defaults = {};
+      response.data.habits.forEach((habit) => {
+        defaults[habit.id] = Boolean(habit.completed_today);
+      });
+      setCheckins(defaults);
+    } catch (error) {
+      notifySystem({
+        type: "error",
+        title: "System Link Failed",
+        message: "Backend is not reachable.",
+      });
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
-    // Define state variables for XP values
-    const [gymXp, setGymXp] = useState(0);
-    const [todoXp, setToDoXp] = useState(0);
-    const [dietXp, setDietXp] = useState(0);
-    const [socialXp, setSocialXp] = useState(0);
+  useEffect(() => {
+    loadDashboard({ showLoading: true });
+  }, []);
 
-    // Handle input change for each input field
-    const handleInputChange = (event, setInput, setXp, xp) => {
-        setInput(event.target.value);
-        
-        if (event.target.value.toLowerCase() === 'yes') {
-            setXp(xp + 25);
-        } else if (event.target.value.toLowerCase() === 'no') {
-            setXp(xp - 5);
-        } else {
-            setXp(0);
-        }
-    };
+  const completedCount = useMemo(
+    () => Object.values(checkins).filter(Boolean).length,
+    [checkins]
+  );
 
-    // Handle form submission.
+  const submitCheckins = async (event) => {
+    event.preventDefault();
+    if (!dashboard?.habits?.length) {
+      notifySystem({
+        title: "All Habits Completed",
+        message: "Add a new habit and complete it to update your level, Player.",
+        detail: "No active quests available",
+      });
+      return;
+    }
+    setSaving(true);
+    try {
+      const response = await api.post("/api/checkins", {
+        items: dashboard.habits.map((habit) => ({
+          habit_id: habit.id,
+          completed: Boolean(habit.completed_today || checkins[habit.id]),
+        })),
+      });
+      setDashboard(response.data.dashboard);
+      const updatedCheckins = {};
+      response.data.dashboard.habits.forEach((habit) => {
+        updatedCheckins[habit.id] = Boolean(habit.completed_today);
+      });
+      setCheckins(updatedCheckins);
+      if (response.data.xpDelta === 0) {
+        notifySystem({
+          title: "All Habits Completed",
+          message: "If you want more progress, add a new habit and complete it.",
+          detail: "Level will update after new XP is earned, Player",
+        });
+      } else {
+        notifySystem({
+          type: response.data.xpDelta > 0 ? "success" : "warning",
+          title: "Level Progress Updated",
+          message: `${response.data.xpDelta > 0 ? "+" : ""}${response.data.xpDelta} XP recorded`,
+          detail: `${response.data.dashboard.progress.current}/${response.data.dashboard.progress.required} XP toward next level`,
+        });
+      }
+      if (response.data.leveledUp) {
+        notifySystem({
+          title: "Level Up",
+          message: `You reached Level ${response.data.dashboard.currentlevel}.`,
+          detail: response.data.dashboard.title,
+        });
+      }
+      if (response.data.reward) {
+        notifySystem({
+          title: "Reward Unlocked",
+          message: response.data.reward,
+          detail: "Claim earned through level progress",
+        });
+      }
+      if (response.data.penalty) {
+        notifySystem({
+          type: "warning",
+          title: "Penalty Assigned",
+          message: response.data.penalty,
+          detail: "Missed quest threshold reached",
+        });
+      }
+    } catch (error) {
+      notifySystem({
+        type: "error",
+        title: "Quest Sync Failed",
+        message: "Could not record daily quests.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
+  const createHabit = async (event) => {
+    event.preventDefault();
+    try {
+      await api.post("/api/habits", {
+        ...habitForm,
+        xp: Number(habitForm.xp),
+        penalty: Number(habitForm.penalty),
+      });
+      setHabitForm(emptyHabit);
+      notifySystem({
+        title: "Habit Saved",
+        message: `${habitForm.name} has been added to active quests.`,
+        detail: "Level requirement recalculated",
+      });
+      loadDashboard();
+    } catch (error) {
+      notifySystem({
+        type: "error",
+        title: "Habit Save Failed",
+        message: "Check the habit details and try again.",
+      });
+    }
+  };
 
+  const deleteHabit = async () => {
+    if (!pendingDelete) return;
+    const habit = pendingDelete;
+    try {
+      await api.delete(`/api/habits/${habit.id}`);
+      notifySystem({
+        title: "Quest Updated",
+        message: `${habit.name} was removed from active quests.`,
+        detail: "Level requirement recalculated",
+      });
+      setPendingDelete(null);
+      loadDashboard();
+    } catch (error) {
+      notifySystem({
+        type: "error",
+        title: "Quest Update Failed",
+        message: "Could not delete habit.",
+      });
+    }
+  };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault(); // Prevent default form submission behavior
-        const prevLevel = items.currentlevel; // Store the current level before the data is submitted
-        const prevtitle=items.title;
-        try {
-            // Send POST request to backend route '/xp' with input data
-            const response = await axios.post('https://system-back-2no1.onrender.com/xp', {
-                gymXp: gymXp,
-                todoXp: todoXp,
-                dietXp: dietXp,
-                socialXp: socialXp,
-            });
+  if (loading) {
+    return <div className="page-state">Loading system data...</div>;
+  }
 
-            const response2 = await axios.post('https://system-back-2no1.onrender.com/datexp', {
-                gymXp: gymXp,
-                todoXp: todoXp,
-                dietXp: dietXp,
-                socialXp: socialXp,
-            });
-
-            // Handle successful response from server (if needed)
-         
-            console.log('XP data saved successfully:', response.data);
-            console.log('XP data saved successfully:', response2.data);
-
-            // Fetch updated data after submission
-            const updatedItems = await axios.get('https://system-back-2no1.onrender.com/get/item1');
-            setItems(updatedItems.data);
-          
-            // Display the success message for data submission
-            Swal.fire({
-                title: 'Success!',
-                text: 'Your data has been submitted successfully.',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                // After the first popup is closed, check if the user has leveled up
-                
-                if (updatedItems.data.currentlevel > prevLevel) {
-                    Swal.fire({
-                        title: 'You Leveled Up!',
-                        html: `<strong>You reached Level</strong>: <strong>${updatedItems.data.currentlevel}</strong>`,
-
-                        icon: 'success',
-                        confirmButtonText: 'Keep Moving Forward!',
-                        customClass: {
-                            popup: 'swal2-backdrop-custom'
-                        }   
-                    });
-                }
-                
-                
-            }).then(()=>{
-                if (updatedItems.data.rewards !== "No Rewards Right Now") {
-                  
-                    Swal.fire({
-                        title: `Rewards! Level: ${updatedItems.data.currentlevel}`,
-                        html: `Congratulations! The <strong>REWARD</strong> is: <strong>${updatedItems.data.rewards}</strong>`,
-                      
-                        confirmButtonText: 'Awesome!',
-                        customClass: {
-                            popup: 'swal2-reward-custom'
-                        },
-                    });
-                }
-            }).then(()=>{
-                if(updatedItems.data.penalties !== "No Penalties Till Now")
-                Swal.fire({
-                    title:  `Penalty!!  Level: ${updatedItems.data.currentlevel}`,
-                    html: `You failed in daily quests so <strong>Penalty</strong> is : <strong>${updatedItems.data.penalties}</strong>`,
-                  
-                    confirmButtonText: 'Wont Repeat This!',
-                    customClass: {
-                        popup: 'swal2-reward-custom'
-                    },
-                });
-            }).then(()=>{
-                if(updatedItems.data.title !== prevtitle){
-                    Swal.fire({
-                        title: `Promoted!!  Level: ${updatedItems.data.currentlevel}`,
-                        html: `You are now => <strong>${updatedItems.data.title}!!</strong>`,
-                      
-                        confirmButtonText: 'Alright!',
-                        customClass: {
-                            popup: 'swal2-reward-custom'
-                        },
-                    });
-                }
-            })
-
-        } catch (error) {
-            // Handle error
-            console.error('Error saving XP data:', error);
-        }
-    };
-    
-    return (
-        <div className='container my-5'>
-            <h1 style={{ textAlign: "center" }}>Welcome Player!</h1>
-            <h1 className="text-center mb-5">Always Give Your 100%</h1>
-
-            <form onSubmit={handleSubmit}>
-                <div className="input-group input-group-sm mb-3" style={{ width: "100%" }}>
-                    <button type="button" className="btn btn-outline-primary">GYM</button>
-                    <input
-                        type="text"
-                        className="form-control"
-                        aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm"
-                        value={gymInput}
-                        onChange={(event) => handleInputChange(event, setGymInput, setGymXp, gymXp)}
-                    />
-                </div>
-
-                <div className="input-group input-group-sm mb-3" style={{ width: "100%" }}>
-                    <button type="button" className="btn btn-outline-success">TO-DO</button>
-                    <input
-                        type="text"
-                        className="form-control"
-                        aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm"
-                        value={todoInput}
-                        onChange={(event) => handleInputChange(event, setTodoInput, setToDoXp, todoXp)}
-                    />
-                </div>
-
-                <div className="input-group input-group-sm mb-3" style={{ width: "100%" }}>
-                    <button type="button" className="btn btn-outline-warning">DIET</button>
-                    <input
-                        type="text"
-                        className="form-control"
-                        aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm"
-                        value={dietInput}
-                        onChange={(event) => handleInputChange(event, setDietInput, setDietXp, dietXp)}
-                    />
-                </div>
-
-                <div className="input-group input-group-sm mb-3" style={{ width: "100%" }}>
-                    <button type="button" className="btn btn-outline-info">SOCIAL-CONFIDENCE</button>
-                    <input
-                        type="text"
-                        className="form-control"
-                        aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm"
-                        value={socialConfidenceInput}
-                        onChange={(event) => handleInputChange(event, setSocialConfidenceInput, setSocialXp, socialXp)}
-                    />
-                </div>
-
-                <button type="submit" className="btn btn-primary btn-block mt-4">Submit</button>
-            </form>
+  return (
+    <div className="quest-page">
+      <section className="hero-panel">
+        <div>
+          <p className="eyebrow">Daily Quest Board</p>
+          <h1>{dashboard?.title || "Starter"}</h1>
+          <p className="hero-copy">
+            Track habits, earn XP, protect streaks, and push your hunter rank forward.
+          </p>
         </div>
-    );
+        <div className="rank-card">
+          <span>Level</span>
+          <strong>{dashboard?.currentlevel ?? 0}</strong>
+          <div className="progress-track">
+            <div style={{ width: `${dashboard?.progress?.percent || 0}%` }} />
+          </div>
+          <small>
+            {dashboard?.progress?.current || 0}/{dashboard?.progress?.required || 100} XP
+          </small>
+        </div>
+      </section>
+
+      <section className="quest-grid">
+        <form className={`panel quests-panel ${refreshing ? "is-refreshing" : ""}`} onSubmit={submitCheckins}>
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">Today</p>
+              <h2>Active habits</h2>
+            </div>
+            <span className="completion-pill">
+              {completedCount}/{dashboard?.habits?.length || 0} complete
+            </span>
+          </div>
+
+          <div className="habit-list">
+            {dashboard?.habits?.map((habit) => (
+              <label
+                className={`habit-row ${habit.completed_today ? "is-completed" : ""}`}
+                key={habit.id}
+              >
+                <input
+                  type="checkbox"
+                  checked={Boolean(checkins[habit.id])}
+                  disabled={Boolean(habit.completed_today)}
+                  onChange={(event) =>
+                    setCheckins((current) => ({
+                      ...current,
+                      [habit.id]: event.target.checked,
+                    }))
+                  }
+                />
+                <span className="habit-check" />
+                <span className="habit-main">
+                  <strong>{habit.name}</strong>
+                  <small>
+                    {habit.category} - {habit.stat} - streak {habit.current_streak}
+                    {habit.completed_today ? " - locked complete" : ""}
+                  </small>
+                </span>
+                <span className="xp-chip">
+                  {habit.completed_today ? "Completed" : `+${habit.xp} XP`}
+                </span>
+                <button
+                  type="button"
+                  className="icon-action"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setPendingDelete(habit);
+                  }}
+                >
+                  Delete
+                </button>
+              </label>
+            ))}
+          </div>
+
+          <button className="primary-action" type="submit" disabled={saving}>
+            {saving ? "Recording..." : "Complete Daily Check-in"}
+          </button>
+        </form>
+
+        <form className="panel habit-builder" onSubmit={createHabit}>
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">Build</p>
+              <h2>New habit</h2>
+            </div>
+          </div>
+          <input
+            value={habitForm.name}
+            onChange={(event) => setHabitForm({ ...habitForm, name: event.target.value })}
+            placeholder="Habit name"
+            required
+          />
+          <div className="field-pair">
+            <input
+              value={habitForm.category}
+              onChange={(event) => setHabitForm({ ...habitForm, category: event.target.value })}
+              placeholder="Category"
+              required
+            />
+            <input
+              value={habitForm.stat}
+              onChange={(event) => setHabitForm({ ...habitForm, stat: event.target.value })}
+              placeholder="Stat"
+              required
+            />
+          </div>
+          <div className="field-pair">
+            <label>
+              XP
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={habitForm.xp}
+                onChange={(event) => setHabitForm({ ...habitForm, xp: event.target.value })}
+              />
+            </label>
+            <label>
+              Penalty
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={habitForm.penalty}
+                onChange={(event) => setHabitForm({ ...habitForm, penalty: event.target.value })}
+              />
+            </label>
+          </div>
+          <button className="secondary-action" type="submit">
+            Add Habit
+          </button>
+        </form>
+      </section>
+
+      {pendingDelete && (
+        <div className="system-modal-backdrop" role="presentation">
+          <section className="system-modal" role="dialog" aria-modal="true" aria-labelledby="delete-habit-title">
+            <div className="system-modal-scan" />
+            <p className="eyebrow">Quest Removal</p>
+            <h2 id="delete-habit-title">Delete {pendingDelete.name}?</h2>
+            <p>
+              This will remove the habit and its history from the system. Your level requirement
+              will be recalculated after deletion.
+            </p>
+            <div className="delete-preview">
+              <span>{pendingDelete.category}</span>
+              <strong>{pendingDelete.stat}</strong>
+              <em>{pendingDelete.xp} XP</em>
+            </div>
+            <div className="system-modal-actions">
+              <button type="button" className="modal-secondary" onClick={() => setPendingDelete(null)}>
+                Cancel
+              </button>
+              <button type="button" className="modal-danger" onClick={deleteHabit}>
+                Delete Quest
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+    </div>
+  );
 }

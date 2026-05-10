@@ -1,0 +1,301 @@
+.rewards-page {
+  display: grid;
+  gap: 22px;
+  animation: rewardsIn 260ms ease both;
+}
+
+.rewards-hero {
+  min-height: 230px;
+  display: flex;
+  align-items: end;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(12, 17, 29, 0.96), rgba(12, 17, 29, 0.7)),
+    url("../images/solo-leveling-characters-good-pfp-j6glq0yye4ieegdk.jpg") center/cover;
+}
+
+.rewards-hero h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 4.6rem);
+  letter-spacing: 0;
+}
+
+.rewards-hero p:not(.eyebrow) {
+  max-width: 720px;
+  margin: 12px 0 0;
+  color: var(--muted);
+}
+
+.rules-layout,
+.rules-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.settings-panel,
+.new-rule-panel,
+.rule-section {
+  padding: 22px;
+}
+
+.settings-panel,
+.new-rule-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 180ms ease, transform 180ms ease, opacity 180ms ease;
+}
+
+.settings-panel label {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.settings-panel input,
+.new-rule-panel input,
+.new-rule-panel textarea,
+.rule-card input,
+.rule-card textarea {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+  outline: none;
+  padding: 10px 12px;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.new-rule-panel textarea,
+.rule-card textarea {
+  resize: vertical;
+}
+
+.settings-panel input:focus,
+.new-rule-panel input:focus,
+.new-rule-panel textarea:focus,
+.rule-card input:focus,
+.rule-card textarea:focus {
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.14);
+}
+
+.outcome-segment {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.outcome-segment button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 900;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.outcome-segment button:hover {
+  color: var(--text);
+}
+
+.outcome-segment button.is-selected {
+  color: #07111f;
+  background: var(--accent);
+  box-shadow: 0 10px 26px rgba(56, 189, 248, 0.18);
+}
+
+.rule-count {
+  white-space: nowrap;
+  border: 1px solid rgba(56, 189, 248, 0.38);
+  border-radius: 999px;
+  color: var(--accent);
+  background: rgba(56, 189, 248, 0.1);
+  font-size: 0.84rem;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+
+.rule-list {
+  display: grid;
+  gap: 12px;
+}
+
+.rule-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  animation: ruleIn 180ms ease both;
+  transition: opacity 160ms ease, border-color 160ms ease, transform 160ms ease, background 160ms ease;
+}
+
+.rule-card:hover {
+  border-color: rgba(56, 189, 248, 0.34);
+  transform: translateY(-1px);
+}
+
+.rule-card.is-muted {
+  opacity: 0.58;
+}
+
+.toggle-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.toggle-row input {
+  width: 18px;
+  height: 18px;
+}
+
+.rule-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.save-rule-action,
+.danger-action {
+  position: relative;
+  overflow: hidden;
+  justify-self: start;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  padding: 9px 12px;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.save-rule-action:hover,
+.danger-action:hover {
+  transform: translateY(-1px);
+}
+
+.save-rule-action {
+  border: 1px solid rgba(34, 197, 94, 0.42);
+  background: rgba(34, 197, 94, 0.12);
+  color: #bbf7d0;
+}
+
+.secondary-action:disabled,
+.primary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.secondary-action:disabled::after,
+.primary-action:disabled::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent);
+  transform: translateX(-120%);
+  animation: actionSync 1100ms ease-in-out infinite;
+}
+
+@keyframes rewardsIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ruleIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes actionSync {
+  to {
+    transform: translateX(120%);
+  }
+}
+
+.danger-action {
+  border: 1px solid rgba(251, 113, 133, 0.4);
+  background: rgba(251, 113, 133, 0.1);
+  color: #fecdd3;
+}
+
+@media (max-width: 900px) {
+  .rules-layout,
+  .rules-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .rewards-page {
+    gap: 16px;
+  }
+
+  .rewards-hero {
+    min-height: 220px;
+    padding: 22px;
+  }
+
+  .rewards-hero h1 {
+    font-size: 2.35rem;
+  }
+
+  .settings-panel,
+  .new-rule-panel,
+  .rule-section {
+    padding: 16px;
+  }
+
+  .outcome-segment {
+    grid-template-columns: 1fr;
+  }
+
+  .rule-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .save-rule-action,
+  .danger-action {
+    width: 100%;
+  }
+}
+
+@media (max-width: 430px) {
+  .rewards-hero {
+    padding: 18px;
+  }
+
+  .rewards-hero p:not(.eyebrow) {
+    font-size: 0.95rem;
+  }
+
+  .rule-actions {
+    grid-template-columns: 1fr;
+  }
+}

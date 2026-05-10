@@ -1,40 +1,30 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from "react";
+import { NavLink } from "react-router-dom";
 
 function Navbar() {
-    return (
-        <div>
-            <nav className="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
-                <div className="container-fluid">
-
-                    <Link className="navbar-brand" to="/">SYSTEM</Link>
-                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span className="navbar-toggler-icon"></span>
-
-                    </button>
-                    <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                            
-                            <li className="nav-item">
-                                <Link className="nav-link active" aria-current="page" to="/">Home</Link>
-                            </li>
-                           
-                            <li className="nav-item">
-                                <Link className="nav-link active" to="/status">Status</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link active" to="/history">History</Link>
-                            </li>
-                            
-                    
-                        </ul>
-                      
-                    </div>
-                </div>
-            </nav>
-
-        </div>
-    )
+  return (
+    <header className="topbar">
+      <div className="brand-cluster">
+        <NavLink className="brand" to="/">
+          <span className="brand-mark">S</span>
+          <span>
+            <strong>SYSTEM</strong>
+            <small>Discipline RPG</small>
+          </span>
+        </NavLink>
+        <NavLink className="brand-reward-link" to="/rewards-penalties">
+          Rewards
+        </NavLink>
+      </div>
+      <nav className="nav-links" aria-label="Primary navigation">
+        <NavLink to="/" end>
+          Quests
+        </NavLink>
+        <NavLink to="/status">Status</NavLink>
+        <NavLink to="/history">History</NavLink>
+      </nav>
+    </header>
+  );
 }
 
-export default Navbar
+export default Navbar;
